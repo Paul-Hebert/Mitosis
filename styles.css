@@ -1,0 +1,23 @@
+#screen{
+	width:600px;
+	height:900px;
+}
+
+#player, .critter{
+	width:50px;
+	height:50px;
+	background:red;
+	border-radius:50%;
+	position:absolute;
+	border-top-right-radius:0px;
+	border-bottom-left-radius:40%;
+}
+
+#center{
+	position:absolute;
+	width:10px;
+	height:10px;
+	background:#000;
+	border-radius:50%;
+	z-index:10;
+}
