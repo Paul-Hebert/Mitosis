@@ -1,7 +1,9 @@
 //  Update 
     function updateGame(){
         for (var runCount = 0; runCount < critterCount; runCount++){
-            critterFunctions(runCount);
+            if (critters[runCount].dead == false){
+                critterFunctions(runCount);
+            }
         }
         return false;
     }
@@ -9,10 +11,9 @@
 //  draw
     function drawGame(){
         for (var runCount = 0; runCount < critterCount; runCount++){
-            draw(runCount);
-
-            $('#center').css('left',critters[0].positionX - 5 + 'px');
-            $('#center').css('top',critters[0].positionY - 5 + 'px');
+            if (critters[runCount].dead == false){
+                draw(runCount);
+            }
         }
     }
 
@@ -21,5 +22,5 @@ function mainLoop() {
     setInterval( function(){
         updateGame();
         drawGame();
-    },1000/60);
+    },1000/40);
 }
