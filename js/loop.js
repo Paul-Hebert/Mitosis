@@ -1,8 +1,11 @@
 //  Update 
     function updateGame(){
-        for (var runCount = 0; runCount < critterCount; runCount++){
+        for (var runCount = 0; runCount < critters.length; runCount++){
             if (critters[runCount].dead == false){
-                critterFunctions(runCount);
+                if (critters[runCount].diet != 'plant'){
+                    critterFunctions(runCount);
+                }
+                mitosis(runCount);
             }
         }
         return false;
@@ -10,7 +13,7 @@
 
 //  draw
     function drawGame(){
-        for (var runCount = 0; runCount < critterCount; runCount++){
+        for (var runCount = 0; runCount < critters.length; runCount++){
             if (critters[runCount].dead == false){
                 draw(runCount);
             }

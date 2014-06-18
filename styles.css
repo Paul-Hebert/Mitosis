@@ -2,9 +2,20 @@
 	box-sizing:border-box;
 }
 
+/*body{
+	background:#000;
+}
+
+#holder{
+	width:1800px;
+	height:1800px;
+	position:absolute;
+	overflow:hidden;
+	border-radius: 100%;
+	background: #fff;
+}*/
+
 #screen{
-	width:600px;
-	height:900px;
 	position:absolute;
 }
 
