@@ -2,7 +2,7 @@
 //Setup
 /***********************************************************************************************/
 
-function createType(i,type,diet,widthVal,heightVal,speed,turnSpeed,sight,mitosisRate,startCount){	
+function createType(i,type,diet,widthVal,heightVal,speed,turnSpeed,sight,mitosisRate,startCount,eyes){	
 	critterTypes[i]= Object.create(null);
 		defineProperty(critterTypes[i], 'type', i); 
 		defineProperty(critterTypes[i], 'diet', diet); 
@@ -16,7 +16,7 @@ function createType(i,type,diet,widthVal,heightVal,speed,turnSpeed,sight,mitosis
 		defineProperty(critterTypes[i], 'mitosisRate', mitosisRate); 
 		defineProperty(critterTypes[i], 'startCount', startCount); 
 		defineProperty(critterTypes[i], 'health', 100); 
-
+		defineProperty(critterTypes[i], 'eyes', eyes); 
 } 	
 
 function createCritters(){
@@ -54,13 +54,28 @@ function createObject(ident,type,spawner){
 
 		defineProperty(critters[ident], 'horizontalM', rando(0,critterTypes[type].speed/10)); 
 		defineProperty(critters[ident], 'verticalM', rando(0,critterTypes[type].speed/10)); 
-		
-		if (spawner != null && critterTypes[type].diet != 'plant'){
+
+		defineProperty(critters[ident], 'collision', false); 
+
+		defineProperty(critters[ident], 'eyes', critterTypes[type].eyes); 
+
+
+		if (spawner != null){
+			if (critterTypes[type].diet != 'plant'){
 	    	defineProperty(critters[ident], 'positionX',critters[spawner].positionX + critters[spawner].widthVal/2);
 	    	defineProperty(critters[ident], 'positionY',critters[spawner].positionY + critters[spawner].heightVal/2);
-	    	defineProperty(critters[ident], 'horizontalM',4);	
-	    	defineProperty(critters[ident], 'verticalM',4);					
+	    	defineProperty(critters[ident],'horizontalM', critters[spawner].horizontalM);	
+	    	defineProperty(critters[ident], 'verticalM', critters[spawner].verticalM);
+	    	} else{
+	    	defineProperty(critters[ident], 'positionX',critters[spawner].positionX + rando(30,400));
+	    	defineProperty(critters[ident], 'positionY',critters[spawner].positionY + rando(30,400));	    		
+	    	}					
 		}
+
+		/*if (ident == chosen){
+			positionX = 900;
+			positionY = 900;
+		}*/
 
 		defineProperty(critters[ident], 'mitosisLevel', rando(0,critterTypes[type].mitosisRate - 1)); 
 		defineProperty(critters[ident], 'mitosisRate', critterTypes[type].mitosisRate); 
@@ -75,19 +90,23 @@ function createObject(ident,type,spawner){
 	
     	if (critterTypes[type].diet == 'plant'){
     		newObject.style.background="green";
+    		newObject.style.borderRadius="100%";
+	    	defineProperty(critters[ident], 'mutationChance', 30);					    		
     	}
 
        	if (critterTypes[type].diet == 'herbivore'){
     		newObject.style.background="orange";
+	    	defineProperty(critters[ident], 'mutationChance', 10);					    		
     	}
 
        	if (critterTypes[type].diet == 'carnivore'){
+	    	defineProperty(critters[ident], 'mutationChance', 4);					    		
     		newObject.style.background="red";
     	}
 
     	document.getElementById('screen').appendChild(newObject);
 
-    	if (type == 7){
+    	if (critterTypes[type].eyes == true){
 			newObject = document.createElement('div');
     		newObject.setAttribute('class','eye');
 
@@ -107,15 +126,55 @@ function defineProperty(obj, name, value){
 }
 
 function evolveType(ident){
-		var o = critters[ident]; 
-		var newDiet	= o.diet;
-		var newWidthVal	= checkMin(o.widthVal + rando(-50,50),10);
-		var newHeightVal =checkMin( o.heightVal + rando(-50,50),10);
-		var newSpeed = checkMin(o.speed + rando(-2,2),1);
-		var newTurnSpeed = o.turnSpeed;
-		var newSight = checkMin(o.sight + rando(-100,+100),100);
-		var newMitosisRate = checkMin(o.mitosisRate + rando(-50,+50),101);
-		createType(critterTypes.length + 1,
+	var o = critters[ident]; 
+	var newDiet	= o.diet;
+	var newWidthVal	= checkMinMax(o.widthVal + rando(-50,50),10,800);
+	var newHeightVal =checkMinMax( o.heightVal + rando(-50,50),10,800);
+	var newSpeed = checkMinMax(o.speed + rando(-2,2),1);
+	var newTurnSpeed = o.turnSpeed;
+	var newSight = checkMinMax(o.sight + rando(-100,100),100);
+	var newMitosisRate = checkMinMax(o.mitosisRate + rando(-5,30),125);
+	var newEyes = o.eyes;
+	
+	var bonus = rando(0,4);
+	switch(bonus){
+		case 0:
+			checkMinMax(newWidthVal	+= 30,10,800);
+			//var newMitosisRate += 5;
+		break;
+
+		case 1:
+			checkMinMax(newHeightVal += 30,10,800);
+			//var newMitosisRate += 5;
+		break;
+
+		case 2:
+			checkMinMax(newSpeed += 1,1);	
+			//var newMitosisRate += 10;
+		break;
+
+		case 3:
+			checkMinMax(newSight += 100,100);
+			newEyes = true;
+			//var newMitosisRate += 5;
+		break;
+
+		case 4:
+			//var newMitosisRate = checkMinMax(o.mitosisRate - 30,125);
+		break;
+	}
+	
+	var dietChange = rando(0,10);
+	if (dietChange == 10){
+		if (o.diet == 'plant'){
+			newDiet = 'herbivore';
+		}
+		if (o.diet == 'herbivore'){
+			newDiet = 'carnivore';
+		}
+	}
+
+	createType(critterTypes.length + 1,
 			'',
 			newDiet,
 			newWidthVal,
@@ -124,16 +183,17 @@ function evolveType(ident){
 			newTurnSpeed,
 			newSight,
 			newMitosisRate,
-			o.startCount
+			o.startCount,
+			newEyes
 			);
-		createObject(critters.length, critterTypes.length - 1, ident)
+	createObject(critters.length, critterTypes.length - 1, ident)
 }
 
 function rando(min,max){
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function checkMin(val,min){
+function checkMinMax(val,min,max){
 	if (val < min){
 		return min;
 	} else{
@@ -145,10 +205,6 @@ function checkMin(val,min){
 /***********************************************************************************************/
 
 function critterFunctions(ident){
-	critters[ident].health -= .1;
-	if (critters[ident].health <= 0){
-		die(ident);
-	}
 	sight(ident);
     critters[ident].angle = getAngle(ident);
     move(ident);  
@@ -159,28 +215,40 @@ function critterFunctions(ident){
 
 document.onmousemove=function(e) {
     var e=e||window.event;
-    critters[0].destX=e.pageX||e.clientX+document.body.scrollLeft;
-    critters[0].destY=e.pageY||e.clientY+document.body.scrollTop;
+    critters[chosen].destX=e.clientX+document.body.scrollLeft;
+    critters[chosen].destY=e.clientY+document.body.scrollTop;
+    //critters[chosen].destX=e.clientX-document.getElementById('screen').scrollLeft;
+    //critters[chosen].destY=e.clientY-document.getElementById('screen').scrollTop;
     return false;
 }
 
 function mitosis(ident){
+	critters[ident].health -= .1;
+	if (critters[ident].health <= 0){
+		die(ident);
+	}
 		if (critters[ident].diet == 'plant'){
 			critters[ident].mitosisLevel++;
 		}
+
 		if (critters[ident].health >= critters[ident].mitosisRate || (critters[ident].diet == 'plant' && critters[ident].mitosisLevel >= critters[ident].mitosisRate)){
-			if (rando(0,10) == 10){
+			if (rando(0,critters[ident].mutationChance) == critters[ident].mutationChance){
 				evolveType(ident);
 			} else{
 				createObject(critters.length, critters[ident].type,ident);
+			}	    	
+			if (ident == chosen){
+				choose(critters.length - 1);
 			}
-	    	
-
-	    	defineProperty(critters[ident], 'horizontalM',-4);	
-	    	defineProperty(critters[ident], 'verticalM',-4);
 
 			critters[ident].mitosisLevel = 0;
-			critters[ident].health = 100
+			critters[ident].horizontalM *= -1;
+			critters[ident].verticalM *= -1;
+
+
+			if (critters[ident].diet != 'plant'){
+				critters[ident].health = 100
+			}
 		}
 }
 
@@ -210,15 +278,14 @@ function sight(ident){
     				if (distance < sight && critters[runCount].dead == false){
 	    				if ((critters[ident].diet == 'herbivore' && critters[runCount].diet == 'plant') || (critters[ident].diet == 'carnivore' && critters[runCount].diet == 'herbivore')){
 	    					if (distance < (critters[ident].widthVal + critters[runCount].widthVal)/2 && $('#critters' + runCount).length){
-	    						die(runCount);
-	    						critters[ident].health += 20;
-	    						}    						
-    						if (distance < closestPrey && closestPredator == 1000 && ident != 0){
-	    						critters[ident].destX = critters[runCount].positionX;
-	    						critters[ident].destY = critters[runCount].positionY;
+	    						eat(ident,runCount);
+	    					}    						
+    						if (distance < closestPrey && closestPredator == 1000 && ident != chosen){
+	    						critters[ident].destX = critters[runCount].positionX + xDiff * .2;
+	    						critters[ident].destY = critters[runCount].positionY + yDiff * .2;
 	    						closestPrey = distance;
 	    					}
-    					} else if (distance < closestPredator && ident != 0 && critters[runCount].diet == 'carnivore' && critters[ident].diet != 'carnivore'){
+    					} else if (distance < closestPredator && ident != chosen && critters[runCount].diet == 'carnivore' && critters[ident].diet != 'carnivore'){
     						if (inverseX == false){
 	    						critters[ident].destX = critters[ident].positionX - xDiff;
 	    					} else{
@@ -234,18 +301,44 @@ function sight(ident){
     				}
 	        	}
 	        
-	        if (closestPrey == 1000 && closestPredator == 1000 && ident != 0){
+	        if (closestPrey == 1000 && closestPredator == 1000 && ident != chosen){
 	        	//critters[ident].destY = (critters[ident].positionY + Math.sin(critters[ident].angle)) * 50;
 	        	//critters[ident].destX = (critters[ident].positionX + Math.cos(critters[ident].angle)) * 50;
 	        	
 	        	//critters[ident].destY = (rando(0,1800));
 	        	//critters[ident].destX = (rando(0,1800));
 
-	        	//critters[ident].destY = 900;
-	        	//critters[ident].destX = 900;
+	        	critters[ident].destY = 900;
+	        	critters[ident].destX = 900;
 	        }
 	    }
 
+}
+
+function eat(ident, runCount){
+	if (critters[runCount].diet == 'plant'){
+		digestion = 6;
+	} else{
+		digestion = 2;
+	}
+
+	critters[runCount].health -= 3;
+
+	critters[ident].health += 3/digestion;
+	die(runCount);
+	critters[ident].health += 20;
+
+	//critters[ident].health += critters[runCount].widthVal * critters[runCount].heightVal / 40;
+
+	critters[ident].collision = true;
+	critters[runCount].collision = true;	
+}
+
+function die(ident,runCount){
+	$('#critters' + ident).fadeOut(300, function(){
+		this.remove()
+	});
+	critters[ident].dead = true;
 }
 
 function getAngle(ident){
@@ -312,18 +405,24 @@ function move(ident){
 }
 
 function inertia(ident){
+	if (critters[ident].collision == true){
+		drag = .8;
+	} else{
+		drag = 20;
+	}
+
 	if (critters[ident].horizontalM > critters[ident].speed/10){
-		critters[ident].horizontalM -= critters[ident].speed/20;
+		critters[ident].horizontalM -= critters[ident].horizontalM/drag;
 	}
 	if (critters[ident].verticalM > critters[ident].speed/10){
-		critters[ident].verticalM -= critters[ident].speed/20;
+		critters[ident].verticalM -= critters[ident].verticalM/drag;
 	}
 
 	if (critters[ident].horizontalM < -critters[ident].speed/10){
-		critters[ident].horizontalM += critters[ident].speed/20;
+		critters[ident].horizontalM -= critters[ident].horizontalM/drag;
 	}
 	if (critters[ident].verticalM < -critters[ident].speed/10){
-		critters[ident].verticalM += critters[ident].speed/20;
+		critters[ident].verticalM -= critters[ident].verticalM/drag;
 	}
 
 	critters[ident].positionX -= critters[ident].horizontalM;
@@ -332,11 +431,15 @@ function inertia(ident){
 	return false;
 }
 
-function die(ident){
-	$('#critters' + ident).fadeOut(300, function(){this.remove()});
-	critters[ident].dead = true;
-}
+function choose(ident){
+    chosen = ident;
+    $('.critter').css('border','none');
+    $('#critters' + chosen).css('border-left','10px solid #000');
+    $('#critters' + chosen).css('border-bottom','10px solid #000');
 
+    /*critters[ident].positionX = 900;
+    critters[ident].positionY = 900;*/
+}
 /***********************************************************************************************/
 //Draw
 /***********************************************************************************************/
@@ -344,20 +447,19 @@ function die(ident){
 
 function draw(ident){
 	if ($('#critters' + ident).length){
-		/*if (ident == 0){
-			$('#screen').css('left',-critters[ident].positionX - (critters[ident].widthVal/2) + 'px');
-		    $('#screen').css('top',-critters[ident].positionY - (critters[ident].heightVal/2) + 'px');			
+		/*if (ident == chosen){
+			$('#screen').css('left',-critters[ident].positionX + (critters[ident].widthVal/2) + 'px');
+		    $('#screen').css('top',-critters[ident].positionY + (critters[ident].heightVal/2) + 'px');			
 		} else{*/
 			$('#critters' + ident).css('left',critters[ident].positionX - (critters[ident].widthVal/2) + 'px');
 		    $('#critters' + ident).css('top',critters[ident].positionY - (critters[ident].heightVal/2) + 'px');
 		//}
 	    document.getElementById("critters" + ident).style.MozTransform= "rotate(" + (critters[ident].angle + 45) + "deg)";
+	    document.getElementById("critters" + ident).style.MozTransform= "rotate(" + (critters[ident].angle + 45) + "deg)";
 	}
     return false;
 }
 
-// Testing:
-xyz=0;
-document.onclick=function(e){
-  console.log(critters[xyz].positionX + ", " + critters[xyz].positionY + ": " + critters[xyz].destX + ", " + critters[xyz].destY + ": " + critters[xyz].angle + ", " + critters[xyz].desiredAngle);
+function writeInfo(){
+	$('#info .bar:last-of-type').css('width', critters[chosen].health + 'px');
 }

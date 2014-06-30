@@ -26,6 +26,9 @@
 	position:absolute;
 	border-top-right-radius:0px;
 	border-bottom-left-radius:40%;
+   -moz-box-shadow:    inset 0 0 5px #000000;
+   -webkit-box-shadow: inset 0 0 5px #000000;
+   box-shadow:         inset 0 0 5px #000000;
 }
 
 #center{
@@ -46,4 +49,31 @@
 	background:#000;
 	border: 13px solid #fff;
 	border-radius: 100%;
+}
+
+#info{
+	position:fixed;
+	top:100px;
+	right:1000px;
+	font-size:100px;
+}
+
+.bar{
+	position:absolute;
+	top:0px;
+	left:0px;
+	border:10px black solid;
+	height:100px;
+	background:red;
+	border-radius: 30px;
+
+
+   -moz-box-shadow:    inset 0 0 10px #000000;
+   -webkit-box-shadow: inset 0 0 10px #000000;
+   box-shadow:         inset 0 0 10px #000000;
+}
+
+.bar:last-of-type{
+	background:green;
+	border-radius-right:0px; 
 }

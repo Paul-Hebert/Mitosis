@@ -16,8 +16,10 @@
         for (var runCount = 0; runCount < critters.length; runCount++){
             if (critters[runCount].dead == false){
                 draw(runCount);
+                critters[runCount].collision = false;
             }
         }
+        writeInfo();
     }
 
 //  Game Loop
